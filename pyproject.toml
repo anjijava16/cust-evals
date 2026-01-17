@@ -1,0 +1,67 @@
+[project]
+name = "custom-evals"
+description = "Custom LLM Evaluation Framework - POC"
+readme = "README.md"
+requires-python = ">=3.8, <3.14"
+license = {text="MIT"}
+keywords = [
+  "Evaluations",
+  "LLM",
+  "Metrics",
+]
+authors = [
+  { name = "Custom Team", email = "team@custom.com" },
+]
+classifiers = [
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+version = "0.1.0"
+dependencies = [
+  "pandas",
+  "typing-extensions>=4.5, <5",
+  "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "openai>=1.0.0",
+  "anthropic>=0.18.0",
+]
+test = [
+  "pytest>=7.0.0",
+  "pandas",
+  "openai>=1.0.0",
+  "anthropic>=0.18.0",
+]
+docs = [
+  "mkdocs>=1.5.0",
+  "mkdocs-material>=9.0.0",
+  "pymdown-extensions>=10.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/custom"]
+
+[tool.hatch.build]
+only-packages = true
+
+[tool.ruff]
+exclude = [".git", "__pycache__", ".tox", "dist"]
+line-length = 100
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+
+[tool.ruff.lint.isort]
+force-single-line = false
