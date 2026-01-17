@@ -44,6 +44,11 @@ docs = [
   "mkdocs-material>=9.0.0",
   "pymdown-extensions>=10.0.0",
 ]
+tracing = [
+  "opentelemetry-api>=1.20.0",
+  "opentelemetry-sdk>=1.20.0",
+  "opentelemetry-exporter-otlp>=1.20.0",
+]
 
 [build-system]
 requires = ["hatchling"]

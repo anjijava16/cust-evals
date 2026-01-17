@@ -28,6 +28,23 @@ This includes:
 - `openai` - For OpenAI models (GPT-4, GPT-3.5)
 - `anthropic` - For Anthropic models (Claude)
 
+### With Phoenix Tracing (Optional)
+
+**Tracing is completely optional.** The framework works perfectly without it.
+
+If you want observability with Phoenix (Arize), install tracing dependencies:
+
+```bash
+pip install -e ".[dev,tracing]"
+```
+
+This adds:
+- `opentelemetry-api` - OpenTelemetry API
+- `opentelemetry-sdk` - OpenTelemetry SDK
+- `opentelemetry-exporter-otlp` - OTLP exporter for Phoenix
+
+See **[Phoenix Tracing Guide](../TRACING_GUIDE.md)** for setup and usage.
+
 ### Verify Installation
 
 ```python
@@ -136,6 +153,39 @@ score = relevancy.evaluate(eval_input)
 print(f"Relevant: {score.label}")  # Output: relevant
 ```
 
+### 4. Phoenix Tracing (Optional)
+
+**Tracing is completely optional.** The framework works end-to-end without it.
+
+If you want to enable Phoenix tracing for observability:
+
+```python
+from custom.evals import initialize_tracing, HallucinationEvaluator
+from custom.evals.llm import LLM
+
+# Step 1: Initialize tracing (optional, only if you want observability)
+initialize_tracing(
+    phoenix_endpoint="http://localhost:6006/v1/traces"  # Your Phoenix endpoint
+)
+
+# Step 2: Use evaluators normally (now automatically traced!)
+llm = LLM(provider="openai", model="gpt-4o-mini")
+evaluator = HallucinationEvaluator(llm)
+
+eval_input = {
+    "input": "What is the capital of France?",
+    "output": "Paris is the capital of France.",
+    "context": "Paris is the capital of France."
+}
+
+score = evaluator.evaluate(eval_input)  # This is now traced in Phoenix UI!
+print(f"{score.label}")
+```
+
+**Without tracing:** Just skip the `initialize_tracing()` call. Everything works the same!
+
+See **[Phoenix Tracing Guide](../TRACING_GUIDE.md)** for complete documentation.
+
 ---
 
 ## Running Examples
@@ -155,6 +205,11 @@ python examples/rag_evaluation.py
 
 # Ground truth handling
 python examples/ground_truth_examples.py
+
+# Phoenix tracing (optional - requires tracing dependencies and Phoenix running)
+pip install -e ".[dev,tracing]"
+python -m phoenix.server.main serve  # In a separate terminal
+python examples/tracing_example.py
 ```
 
 ---

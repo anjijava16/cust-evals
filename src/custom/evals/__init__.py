@@ -11,6 +11,17 @@ from .llm_evaluators import (
 )
 from .metrics import custom_accuracy, exact_match, sentiment_score
 
+# Tracing support (optional)
+try:
+    from .tracing import initialize_tracing, get_tracer, traced, add_span_attributes
+    TRACING_AVAILABLE = True
+except ImportError:
+    TRACING_AVAILABLE = False
+    initialize_tracing = None
+    get_tracer = None
+    traced = None
+    add_span_attributes = None
+
 __version__ = "0.1.0"
 
 __all__ = [
@@ -28,4 +39,9 @@ __all__ = [
     "CoherenceEvaluator",
     "FaithfulnessEvaluator",
     "AnswerRelevancyEvaluator",
+    # Tracing (optional)
+    "initialize_tracing",
+    "get_tracer",
+    "traced",
+    "add_span_attributes",
 ]

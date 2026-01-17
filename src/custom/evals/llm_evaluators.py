@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from .evaluators import Score
 from .llm import LLM, PromptTemplate
+from .tracing import get_tracer, add_span_attributes
 
 
 class LLMEvaluator:
@@ -104,61 +105,79 @@ class LLMEvaluator:
         Returns:
             Score with LLM judgment
         """
-        # Check if ground truth is available
-        has_ground_truth = self._check_ground_truth(eval_input)
+        # Create tracing span
+        tracer = get_tracer()
+        with tracer.span(f"evaluate.{self.name}", attributes={
+            "evaluator.name": self.name,
+            "evaluator.kind": "llm",
+            "evaluator.direction": self.DIRECTION,
+            "llm.model": self.llm.model,
+            "llm.provider": self.llm.provider,
+        }):
+            # Check if ground truth is available
+            has_ground_truth = self._check_ground_truth(eval_input)
+            add_span_attributes({"has_ground_truth": has_ground_truth})
 
-        # If ground truth is required but not available, return error score
-        if self.REQUIRES_GROUND_TRUTH and not has_ground_truth:
+            # If ground truth is required but not available, return error score
+            if self.REQUIRES_GROUND_TRUTH and not has_ground_truth:
+                add_span_attributes({"result": "no_ground_truth"})
+                return Score(
+                    score=0.0,
+                    name=self.name,
+                    label="no_ground_truth",
+                    explanation=f"{self.NAME} requires ground truth data (expected value)",
+                    kind="llm",
+                    direction=self.DIRECTION,  # type: ignore
+                    metadata={"model": self.llm.model, "has_ground_truth": False}
+                )
+
+            # Select appropriate prompt template
+            if has_ground_truth or not self.PROMPT_TEMPLATE_NO_GROUND_TRUTH:
+                prompt_template = self.PROMPT_TEMPLATE
+            else:
+                prompt_template = self.PROMPT_TEMPLATE_NO_GROUND_TRUTH
+
+            # Render prompt with input variables
+            try:
+                prompt = prompt_template.format(**eval_input)
+            except KeyError as e:
+                add_span_attributes({"result": "error", "error": str(e)})
+                return Score(
+                    score=0.0,
+                    name=self.name,
+                    label="error",
+                    explanation=f"Missing required input field: {e}",
+                    kind="llm",
+                    direction=self.DIRECTION,  # type: ignore
+                    metadata={"model": self.llm.model, "error": str(e)}
+                )
+
+            # Create schema for structured output
+            schema = self._create_output_schema()
+
+            # Get LLM response
+            response = self.llm.generate_object(prompt, schema)
+
+            # Extract label and explanation
+            label = response.get("label", "")
+            explanation = response.get("explanation", "")
+            score_value = self.CHOICES.get(label, 0.0)
+
+            # Add result to span
+            add_span_attributes({
+                "result.label": label,
+                "result.score": score_value,
+            })
+
             return Score(
-                score=0.0,
+                score=score_value,
                 name=self.name,
-                label="no_ground_truth",
-                explanation=f"{self.NAME} requires ground truth data (expected value)",
+                label=label,
+                explanation=explanation,
                 kind="llm",
                 direction=self.DIRECTION,  # type: ignore
-                metadata={"model": self.llm.model, "has_ground_truth": False}
+                metadata={"model": self.llm.model, "has_ground_truth": has_ground_truth}
             )
-
-        # Select appropriate prompt template
-        if has_ground_truth or not self.PROMPT_TEMPLATE_NO_GROUND_TRUTH:
-            prompt_template = self.PROMPT_TEMPLATE
-        else:
-            prompt_template = self.PROMPT_TEMPLATE_NO_GROUND_TRUTH
-
-        # Render prompt with input variables
-        try:
-            prompt = prompt_template.format(**eval_input)
-        except KeyError as e:
-            return Score(
-                score=0.0,
-                name=self.name,
-                label="error",
-                explanation=f"Missing required input field: {e}",
-                kind="llm",
-                direction=self.DIRECTION,  # type: ignore
-                metadata={"model": self.llm.model, "error": str(e)}
-            )
-
-        # Create schema for structured output
-        schema = self._create_output_schema()
-
-        # Get LLM response
-        response = self.llm.generate_object(prompt, schema)
-
-        # Extract label and explanation
-        label = response.get("label", "")
-        explanation = response.get("explanation", "")
-        score_value = self.CHOICES.get(label, 0.0)
-
-        return Score(
-            score=score_value,
-            name=self.name,
-            label=label,
-            explanation=explanation,
-            kind="llm",
-            direction=self.DIRECTION,  # type: ignore
-            metadata={"model": self.llm.model, "has_ground_truth": has_ground_truth}
-        )
 
     async def _async_evaluate(self, eval_input: Dict[str, Any]) -> Score:
         """Internal async evaluation logic.

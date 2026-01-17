@@ -1,10 +1,21 @@
-# Custom Evals - POC
+# Custom Evals - Multi-Framework Evaluation
 
-A lightweight evaluation framework for LLM outputs, inspired by Phoenix Evals.
+A lightweight evaluation framework for LLM outputs, supporting evaluation patterns from **RAGAS**, **DeepEval**, and **Phoenix Evals**.
+
+**🔥 NEW: Phoenix (Arize) Tracing Integration via OpenTelemetry!**
+
+## 🎯 Multi-Framework Support
+
+Custom Evals supports evaluation patterns from:
+- **✅ RAGAS** - RAG evaluation metrics (Faithfulness, Answer Relevancy)
+- **✅ DeepEval** - Comprehensive LLM evaluation (key metrics implemented)
+- **✅ Phoenix Evals** - API patterns + **OpenTelemetry tracing** 🔥
+
+See **[FRAMEWORK_SUPPORT.md](FRAMEWORK_SUPPORT.md)** for complete details.
 
 ## Features
 
-This POC includes both **code-based** and **LLM-based** evaluators:
+This framework includes **code-based** and **LLM-based** evaluators:
 
 ### Code-Based Metrics
 - **Exact Match**: Binary comparison of output vs expected
@@ -23,15 +34,48 @@ This POC includes both **code-based** and **LLM-based** evaluators:
 - **FaithfulnessEvaluator**: Check if response is grounded in retrieval context (inspired by DeepEval/RAGAS)
 - **AnswerRelevancyEvaluator**: Evaluate answer-to-query relevance (inspired by DeepEval/RAGAS)
 
+### 🔥 Phoenix (Arize) Tracing (Optional - NEW!)
+
+**Tracing is completely optional.** The framework works perfectly end-to-end without it.
+
+If you want observability with Phoenix, enable OpenTelemetry tracing:
+
+```python
+from custom.evals import initialize_tracing, HallucinationEvaluator
+from custom.evals.llm import LLM
+
+# Option 1: WITHOUT tracing (default)
+llm = LLM(provider="openai", model="gpt-4o-mini")
+evaluator = HallucinationEvaluator(llm)
+score = evaluator.evaluate({...})  # Works perfectly!
+
+# Option 2: WITH tracing (optional, for observability)
+initialize_tracing(phoenix_endpoint="http://localhost:6006/v1/traces")
+score = evaluator.evaluate({...})  # Now traced in Phoenix UI!
+```
+
+**Benefits of tracing (when enabled):**
+- 📊 Visualize evaluation flows in Phoenix
+- 🔍 Debug performance issues
+- ⏱️ Monitor production usage
+- 📈 Analyze patterns
+
+See **[TRACING_GUIDE.md](TRACING_GUIDE.md)** for setup and **[docs/tracing.md](docs/tracing.md)** for complete guide.
+
 ## Installation
 
 ```bash
 # Basic installation
 pip install -e .
 
-# With LLM support
+# With LLM support (recommended)
 pip install -e ".[dev]"
+
+# With Phoenix tracing (optional - only if you want observability)
+pip install -e ".[dev,tracing]"
 ```
+
+**Note:** Tracing is completely optional. The framework works perfectly with just `pip install -e ".[dev]"`
 
 ## Quick Start
 

@@ -6,7 +6,7 @@ site_author: Custom Evals Team
 site_url: https://anjijava16.github.io/cust-evals/
 
 # Repository
-repo_name: your-repo/cust-evals
+repo_name: anjijava16/cust-evals
 repo_url: https://github.com/anjijava16/cust-evals
 edit_uri: edit/main/docs/
 
@@ -75,6 +75,7 @@ nav:
   - Guides:
       - API Reference: api-reference.md
       - LLM Integration: llm-integration.md
+      - Phoenix Tracing (Optional): tracing.md
       - Ground Truth Handling: ground-truth.md
       - Architecture: architecture.md
       - Framework Comparison: framework-comparison.md

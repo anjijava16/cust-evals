@@ -18,6 +18,7 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - **[LLM Integration](llm-integration.md)** - LLM class, supported providers, configuration
 
 ### Advanced Topics
+- **[Phoenix Tracing (Optional)](tracing.md)** - OpenTelemetry tracing for observability with Phoenix (Arize)
 - **[Ground Truth Handling](ground-truth.md)** - Flexible ground truth support for production and testing
 - **[Architecture](architecture.md)** - System design, patterns, and extensibility
 - **[Framework Comparison](framework-comparison.md)** - How we compare to DeepEval, RAGAS, Phoenix Evals
@@ -77,6 +78,7 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 ✅ **Multi-Provider** - OpenAI and Anthropic support
 ✅ **Phoenix Evals Compatible** - Similar API design
 ✅ **RAG Optimized** - Metrics from DeepEval and RAGAS
+✅ **Optional Tracing** - Phoenix (Arize) tracing via OpenTelemetry (completely optional)
 ✅ **Extensible** - Easy to add custom evaluators
 
 ---
