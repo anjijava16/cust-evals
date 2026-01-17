@@ -17,12 +17,13 @@ This guide covers 4 additional agent frameworks with comprehensive examples and 
 
 ## Overview
 
-This document covers **4 additional agent frameworks**:
+This document covers **5 additional agent frameworks**:
 
 1. **Autogen** (Microsoft) - Multi-agent conversations
 2. **CrewAI** - Role-based agent orchestration
 3. **OpenAI Assistants API** - Official OpenAI agents with tools
-4. **PydanticAI** - Type-safe agents with Pydantic
+4. **OpenAI Swarm** - Multi-agent orchestration SDK
+5. **PydanticAI** - Type-safe agents with Pydantic
 
 All examples include comprehensive testing with custom-evals metrics.
 
@@ -373,6 +374,140 @@ if run.status == "requires_action":
 
 ---
 
+### OpenAI Swarm
+
+**File**: `examples/openai_swarm_agent_example.py`
+
+**Description**:
+OpenAI's experimental multi-agent orchestration framework designed for lightweight agent coordination and handoffs.
+
+**Key Features**:
+- Lightweight multi-agent orchestration
+- Agent handoffs and routing
+- Context passing between agents
+- Tool calling with shared context
+- Simple and intuitive API
+
+**Quick Start**:
+
+```bash
+# Install
+pip install git+https://github.com/openai/swarm.git
+
+# Run
+export OPENAI_API_KEY="your-key"
+python examples/openai_swarm_agent_example.py
+```
+
+**Example Code**:
+
+```python
+from swarm import Swarm, Agent
+from custom.evals import CoherenceEvaluator, RelevanceEvaluator
+from custom.evals.llm import LLM
+
+client = Swarm()
+
+# Create agents
+sales_agent = Agent(
+    name="Sales Agent",
+    instructions="You help with sales inquiries.",
+    model="gpt-4o-mini"
+)
+
+support_agent = Agent(
+    name="Support Agent",
+    instructions="You help with support questions.",
+    model="gpt-4o-mini"
+)
+
+# Define handoff functions
+def transfer_to_sales():
+    """Transfer to sales agent."""
+    return sales_agent
+
+def transfer_to_support():
+    """Transfer to support agent."""
+    return support_agent
+
+# Create triage agent with handoffs
+triage_agent = Agent(
+    name="Triage Agent",
+    instructions="Route customers to the right agent.",
+    functions=[transfer_to_sales, transfer_to_support],
+    model="gpt-4o-mini"
+)
+
+# Run conversation
+response = client.run(
+    agent=triage_agent,
+    messages=[{"role": "user", "content": "I want to buy your product"}]
+)
+
+# Get response
+final_message = response.messages[-1]
+content = final_message["content"]
+
+print(f"Agent used: {response.agent.name}")
+print(f"Response: {content}")
+
+# Evaluate
+eval_llm = LLM(provider="openai", model="gpt-4o-mini")
+evaluator = CoherenceEvaluator(eval_llm)
+score = evaluator.evaluate({
+    "input": "I want to buy your product",
+    "output": content
+})
+
+print(f"Coherence: {score.label} ({score.score:.2f})")
+```
+
+**Multi-Agent with Tools**:
+
+```python
+# Define tools
+def get_user_info(user_id: str) -> str:
+    """Get user information."""
+    return f"User {user_id}: John Smith, Premium tier"
+
+def get_order_status(order_id: str) -> str:
+    """Get order status."""
+    return f"Order {order_id}: Shipped, arrives in 2 days"
+
+# Create agent with tools
+agent = Agent(
+    name="Customer Service",
+    instructions="Help customers with their accounts and orders.",
+    functions=[get_user_info, get_order_status],
+    model="gpt-4o-mini"
+)
+
+# Run with context
+response = client.run(
+    agent=agent,
+    messages=[{
+        "role": "user",
+        "content": "Context: user_id=U001\n\nCan you look up my account?"
+    }]
+)
+```
+
+**Test Suites**:
+
+1. **Simple Swarm**: Basic agent interactions
+2. **Multi-Agent Routing**: Agent handoffs and coordination
+3. **Tools and Context**: Function calling with context passing
+4. **Quality Gates**: Automated quality checks
+5. **End-to-End Workflow**: Complete customer service scenario
+
+**Use Cases**:
+- Customer service routing
+- Multi-agent coordination
+- Context-aware handoffs
+- Lightweight agent orchestration
+
+---
+
 ### PydanticAI
 
 **File**: `examples/pydanticai_agent_example.py`
@@ -495,16 +630,17 @@ print(f"Confidence: {analysis.confidence}")
 
 ## Quick Comparison
 
-| Feature | Autogen | CrewAI | OpenAI Assistants | PydanticAI |
-|---------|---------|--------|-------------------|------------|
-| **Multi-Agent** | ✅ Built-in | ✅ Role-based | ❌ Single agent | ✅ Custom |
-| **Code Execution** | ✅ Native | ❌ No | ✅ Interpreter | ❌ No |
-| **Function Calling** | ✅ Yes | ⚠️  Limited | ✅ Native | ✅ Yes |
-| **Structured Output** | ❌ No | ❌ No | ❌ No | ✅ Pydantic |
-| **Persistent Threads** | ❌ No | ❌ No | ✅ Built-in | ❌ No |
-| **Type Safety** | ⚠️  Partial | ⚠️  Partial | ⚠️  Partial | ✅ Full |
-| **Learning Curve** | Medium | Low | Low | Medium |
-| **Best For** | Research & Dev | Content/Business | Production Apps | Type-Safe Apps |
+| Feature | Autogen | CrewAI | OpenAI Assistants | OpenAI Swarm | PydanticAI |
+|---------|---------|--------|-------------------|--------------|------------|
+| **Multi-Agent** | ✅ Built-in | ✅ Role-based | ❌ Single agent | ✅ Orchestration | ✅ Custom |
+| **Code Execution** | ✅ Native | ❌ No | ✅ Interpreter | ❌ No | ❌ No |
+| **Function Calling** | ✅ Yes | ⚠️  Limited | ✅ Native | ✅ Yes | ✅ Yes |
+| **Agent Handoffs** | ⚠️  Manual | ⚠️  Via Tasks | ❌ No | ✅ Native | ⚠️  Manual |
+| **Structured Output** | ❌ No | ❌ No | ❌ No | ❌ No | ✅ Pydantic |
+| **Persistent Threads** | ❌ No | ❌ No | ✅ Built-in | ❌ No | ❌ No |
+| **Type Safety** | ⚠️  Partial | ⚠️  Partial | ⚠️  Partial | ⚠️  Partial | ✅ Full |
+| **Learning Curve** | Medium | Low | Low | **Very Low** | Medium |
+| **Best For** | Research & Dev | Content/Business | Production Apps | **Agent Routing** | Type-Safe Apps |
 
 ---
 
@@ -529,6 +665,12 @@ print(f"Confidence: {analysis.confidence}")
 - Need persistent context
 - Official OpenAI support preferred
 - File handling required
+
+**Use OpenAI Swarm when**:
+- Need lightweight agent coordination
+- Building multi-agent routing systems
+- Agent handoffs are critical
+- Prefer simple, intuitive API
 
 **Use PydanticAI when**:
 - Type safety is critical
@@ -672,12 +814,14 @@ def test_agent_framework(agent_class, test_cases):
 ```bash
 # All frameworks
 pip install pyautogen crewai openai>=1.0.0 pydantic-ai pydantic>=2.0
+pip install git+https://github.com/openai/swarm.git
 
 # Individual frameworks
-pip install pyautogen        # Autogen
-pip install crewai           # CrewAI
-pip install openai>=1.0.0    # OpenAI Assistants
-pip install pydantic-ai pydantic>=2.0  # PydanticAI
+pip install pyautogen                              # Autogen
+pip install crewai                                 # CrewAI
+pip install openai>=1.0.0                         # OpenAI Assistants
+pip install git+https://github.com/openai/swarm.git  # OpenAI Swarm
+pip install pydantic-ai pydantic>=2.0             # PydanticAI
 
 # Custom evals
 cd cust-evals
@@ -696,6 +840,7 @@ export OPENAI_API_KEY="your-key"
 python examples/autogen_agent_example.py
 python examples/crewai_agent_example.py
 python examples/openai_assistants_example.py
+python examples/openai_swarm_agent_example.py
 python examples/pydanticai_agent_example.py
 ```
 
@@ -703,14 +848,14 @@ python examples/pydanticai_agent_example.py
 
 ## Summary
 
-You now have **4 additional agent frameworks** with:
+You now have **5 additional agent frameworks** with:
 - ✅ Production-ready examples
 - ✅ Comprehensive testing
 - ✅ Custom-evals integration
 - ✅ Quality gates
 - ✅ Best practices
 
-**Total Agent Frameworks Covered**: 8
+**Total Agent Frameworks Covered**: 9
 1. LangChain ReAct
 2. LangGraph
 3. Multi-Agent System
@@ -718,7 +863,8 @@ You now have **4 additional agent frameworks** with:
 5. **Autogen** 🆕
 6. **CrewAI** 🆕
 7. **OpenAI Assistants** 🆕
-8. **PydanticAI** 🆕
+8. **OpenAI Swarm** 🆕
+9. **PydanticAI** 🆕
 
 For complete RAG examples, see [AGENTS_AND_RAG_GUIDE.md](AGENTS_AND_RAG_GUIDE.md).
 
