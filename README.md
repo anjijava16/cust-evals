@@ -227,12 +227,25 @@ Comprehensive documentation is available in the `docs/` folder:
 - **[LLM-Based Evaluators](docs/evaluators/llm-based.md)** - General LLM evaluation
 - **[RAG-Specific Evaluators](docs/evaluators/rag-specific.md)** - RAG system evaluation (NEW!)
 
+### Integration Guides (NEW!)
+
+**Works with ALL frameworks!**
+
+- **[Agents & Multi-Agent Systems](docs/agents-integration.md)** - LangChain agents, LlamaIndex agents, CrewAI, custom agents
+- **[RAG Applications](docs/rag-integration.md)** - LangChain RAG, LlamaIndex RAG, custom RAG pipelines
+- **[LLM Applications](docs/llm-app-integration.md)** - Chatbots, Q&A systems, summarization, classification
+
 ### Advanced Topics
 
 - **[LLM Integration](docs/llm-integration.md)** - LLM setup and configuration
+- **[Phoenix Tracing](docs/tracing.md)** - Optional OpenTelemetry tracing with Phoenix (NEW!)
 - **[Ground Truth Handling](docs/ground-truth.md)** - Flexible ground truth support
 - **[Architecture](docs/architecture.md)** - System design and patterns
 - **[Framework Comparison](docs/framework-comparison.md)** - Compare with DeepEval, RAGAS, Phoenix Evals
+
+### Testing
+
+- **[Testing Guide](docs/testing.md)** - Comprehensive test suite (150+ tests) (NEW!)
 
 ### Contributing
 

@@ -17,11 +17,19 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - **[Core API](api-reference.md)** - Score class, create_evaluator decorator, evaluator methods
 - **[LLM Integration](llm-integration.md)** - LLM class, supported providers, configuration
 
+### Integration Guides
+- **[Agents Integration](agents-integration.md)** - Integrate with AI agents and multi-agent systems (LangChain, LlamaIndex, CrewAI, custom agents)
+- **[RAG Integration](rag-integration.md)** - Integrate with RAG applications (LangChain RAG, LlamaIndex RAG, custom RAG)
+- **[LLM App Integration](llm-app-integration.md)** - Integrate with simple LLM applications (chatbots, Q&A, summarization, classification)
+
 ### Advanced Topics
 - **[Phoenix Tracing (Optional)](tracing.md)** - OpenTelemetry tracing for observability with Phoenix (Arize)
 - **[Ground Truth Handling](ground-truth.md)** - Flexible ground truth support for production and testing
 - **[Architecture](architecture.md)** - System design, patterns, and extensibility
 - **[Framework Comparison](framework-comparison.md)** - How we compare to DeepEval, RAGAS, Phoenix Evals
+
+### Testing
+- **[Testing Guide](testing.md)** - Comprehensive test suite documentation (150+ tests)
 
 ### Contributing
 - **[Contributing Guide](contributing.md)** - How to add new evaluators and metrics
@@ -35,15 +43,25 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 2. Try **[Examples](examples.md)**
 3. Explore **[Code-Based Metrics](evaluators/code-based.md)**
 
-### For LLM Evaluation
-1. Read **[LLM Integration](llm-integration.md)**
-2. Use **[LLM-Based Evaluators](evaluators/llm-based.md)**
-3. Check **[API Reference](api-reference.md)**
+### For Agent Projects
+1. Read **[Agents Integration](agents-integration.md)**
+2. Works with **ALL frameworks** (LangChain, LlamaIndex, CrewAI, custom)
+3. Multi-agent system evaluation included
 
-### For RAG Systems
-1. Read **[RAG-Specific Evaluators](evaluators/rag-specific.md)**
-2. See **[Framework Comparison](framework-comparison.md)**
-3. Try **[RAG Examples](examples.md#rag-evaluation)**
+### For RAG Applications
+1. Read **[RAG Integration](rag-integration.md)**
+2. See **[RAG-Specific Evaluators](evaluators/rag-specific.md)**
+3. Works with **ALL RAG frameworks**
+
+### For LLM Applications
+1. Read **[LLM App Integration](llm-app-integration.md)**
+2. Use **[LLM-Based Evaluators](evaluators/llm-based.md)**
+3. Covers chatbots, Q&A, summarization, classification
+
+### For Testing & Quality
+1. Read **[Testing Guide](testing.md)**
+2. Run tests: `pytest`
+3. Check coverage: `pytest --cov=custom.evals`
 
 ### For Contributors
 1. Read **[Architecture](architecture.md)**
