@@ -32,57 +32,85 @@ Complete documentation for all agent and RAG frameworks with custom-evals integr
    - Customer service, technical support, sales agents
    - **File**: `examples/google_vertex_agent_example.py`
 
+5. **[Google ADK (Agent Development Kit)](../examples/google_adk_agent_example.py)** 🆕
+   - Google's production agent framework
+   - Gemini models integration
+   - Multi-agent collaboration
+   - Tool integration and state management
+   - **File**: `examples/google_adk_agent_example.py`
+   - **Docs**: `docs/frameworks/google-adk.md`
+
 ### Additional Frameworks
 
-5. **[Autogen (Microsoft)](frameworks/autogen.md)** ⭐
+6. **[Autogen (Microsoft)](frameworks/autogen.md)** ⭐
    - Multi-agent conversations
    - Code execution capabilities
    - Group chat management
    - **File**: `examples/autogen_agent_example.py`
    - **Docs**: `docs/frameworks/autogen.md`
 
-6. **[CrewAI](frameworks/crewai.md)** ⭐
+7. **[CrewAI](frameworks/crewai.md)** ⭐
    - Role-based agent orchestration
    - Sequential and hierarchical processes
    - Task dependencies
    - **File**: `examples/crewai_agent_example.py`
    - **Docs**: `docs/frameworks/crewai.md`
 
-7. **[OpenAI Assistants API](../examples/openai_assistants_example.py)**
-   - Official OpenAI SDK for agents
-   - Persistent conversation threads
-   - Function calling and code interpreter
-   - **File**: `examples/openai_assistants_example.py`
+8. **[OpenAI Agents Framework](../examples/openai_agents_framework_example.py)** 🆕
+   - Official OpenAI Agents framework
+   - Native handoffs and routing
+   - Function tools with decorators
+   - Multi-agent collaboration
+   - **File**: `examples/openai_agents_framework_example.py`
+   - **Docs**: `docs/frameworks/openai-agents-framework.md`
 
-8. **[OpenAI Swarm](../examples/openai_swarm_agent_example.py)** 🆕
-   - Lightweight multi-agent orchestration
-   - Native agent handoffs
-   - Context passing between agents
-   - **File**: `examples/openai_swarm_agent_example.py`
+9. **[OpenAI Agents SDK](../examples/openai_agent_example.py)**
+   - Core OpenAI function calling agents
+   - Stateless agent pattern
+   - Direct control over message flow
+   - **File**: `examples/openai_agent_example.py`
+   - **Docs**: `docs/frameworks/openai-agents.md`
 
-9. **[PydanticAI](../examples/pydanticai_agent_example.py)**
-   - Type-safe agent development
-   - Structured outputs with Pydantic models
-   - Tool calling with validation
-   - **File**: `examples/pydanticai_agent_example.py`
+10. **[OpenAI Assistants API](../examples/openai_assistants_example.py)**
+    - Official OpenAI SDK for agents
+    - Persistent conversation threads
+    - Function calling and code interpreter
+    - **File**: `examples/openai_assistants_example.py`
+    - **Docs**: `docs/frameworks/openai-assistants.md`
+
+11. **[OpenAI Swarm](../examples/openai_swarm_agent_example.py)**
+    - Lightweight multi-agent orchestration
+    - Native agent handoffs
+    - Context passing between agents
+    - **File**: `examples/openai_swarm_agent_example.py`
+    - **Docs**: `docs/frameworks/openai-swarm.md`
+
+12. **[PydanticAI](../examples/pydanticai_agent_example.py)**
+    - Type-safe agent development
+    - Structured outputs with Pydantic models
+    - Tool calling with validation
+    - **File**: `examples/pydanticai_agent_example.py`
+    - **Docs**: `docs/frameworks/pydanticai.md`
 
 ---
 
 ## 🔍 RAG Frameworks
 
-### 10. **LangChain + Qdrant RAG**
+### 13. **LangChain + Qdrant RAG**
    - PDF processing and text extraction
    - OpenAI embeddings with Qdrant vector DB
    - RetrievalQA chain
    - RAG-specific evaluation (Faithfulness, Answer Relevancy)
    - **File**: `examples/rag_langchain_qdrant.py`
+   - **Docs**: `docs/frameworks/langchain-rag.md`
 
-### 11. **LlamaIndex + Qdrant RAG**
+### 14. **LlamaIndex + Qdrant RAG**
    - Multi-format document loading
    - SentenceSplitter for chunking
    - Query engine with response synthesis
    - Multi-document reasoning
    - **File**: `examples/rag_llamaindex_qdrant.py`
+   - **Docs**: `docs/frameworks/llamaindex-rag.md`
 
 ---
 
@@ -117,8 +145,19 @@ Complete documentation for all agent and RAG frameworks with custom-evals integr
 
 ### Framework-Specific Docs
 
+**Agent Frameworks**:
 - **[Autogen Documentation](frameworks/autogen.md)** ⭐
 - **[CrewAI Documentation](frameworks/crewai.md)** ⭐
+- **[Google ADK Documentation](frameworks/google-adk.md)** ⭐ 🆕
+- **[OpenAI Agents Framework Documentation](frameworks/openai-agents-framework.md)** ⭐ 🆕
+- **[OpenAI Agents SDK Documentation](frameworks/openai-agents.md)** ⭐
+- **[OpenAI Assistants Documentation](frameworks/openai-assistants.md)** ⭐
+- **[OpenAI Swarm Documentation](frameworks/openai-swarm.md)** ⭐
+- **[PydanticAI Documentation](frameworks/pydanticai.md)** ⭐
+
+**RAG Frameworks**:
+- **[LangChain RAG Documentation](frameworks/langchain-rag.md)** ⭐
+- **[LlamaIndex RAG Documentation](frameworks/llamaindex-rag.md)** ⭐
 
 ---
 
@@ -145,6 +184,42 @@ python examples/crewai_agent_example.py
 ```
 
 **Best For**: Content creation, business workflows, sequential tasks
+
+---
+
+### Google ADK
+
+```bash
+pip install google-generativeai
+export GOOGLE_API_KEY="your-google-key"
+python examples/google_adk_agent_example.py
+```
+
+**Best For**: Production agents with Gemini, Google Cloud integration
+
+---
+
+### OpenAI Agents Framework
+
+```bash
+pip install openai-agents
+export OPENAI_API_KEY="your-key"
+python examples/openai_agents_framework_example.py
+```
+
+**Best For**: Official OpenAI agents, advanced handoffs, multi-agent systems
+
+---
+
+### OpenAI Agents SDK
+
+```bash
+pip install openai>=1.0.0
+export OPENAI_API_KEY="your-key"
+python examples/openai_agent_example.py
+```
+
+**Best For**: Custom function calling agents, direct control, stateless agents
 
 ---
 
@@ -216,8 +291,11 @@ python examples/rag_llamaindex_qdrant.py
 | LangGraph | Agent | Custom | ✅ | ❌ | Medium |
 | Multi-Agent | System | ✅ | ✅ | ❌ | High |
 | Vertex AI | Agent | Routing | ✅ | ❌ | Medium |
+| **Google ADK** | **Agent** | **✅** | **✅** | **❌** | **Low-Medium** |
 | **Autogen** | **Agent** | **✅** | **✅** | **❌** | **Medium** |
 | **CrewAI** | **Agent** | **✅** | **⚠️** | **❌** | **Low** |
+| **OpenAI Agents** | **Agent** | **✅** | **✅** | **❌** | **Low-Medium** |
+| **OpenAI SDK** | **Agent** | **❌** | **✅** | **❌** | **Low** |
 | **Assistants** | **Agent** | **❌** | **✅** | **❌** | **Low** |
 | **Swarm** | **Agent** | **✅** | **✅** | **❌** | **Very Low** |
 | **PydanticAI** | **Agent** | **Custom** | **✅** | **✅** | **Medium** |
@@ -381,15 +459,15 @@ print(f"Explanation: {score.explanation}")
 
 ## 🎉 Summary
 
-**11 Complete Frameworks**:
-- 9 Agent Frameworks
+**14 Complete Frameworks**:
+- 12 Agent Frameworks
 - 2 RAG Frameworks
 
 **Comprehensive Coverage**:
-- 7,400+ lines of code
-- 3,000+ lines of documentation
-- 51 test suites
-- 250+ evaluations
+- 8,200+ lines of code
+- 4,000+ lines of documentation
+- 60+ test suites
+- 300+ evaluations
 
 **All frameworks are production-ready with custom-evals integration!**
 
