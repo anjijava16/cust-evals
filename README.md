@@ -170,7 +170,35 @@ print(f"{score.label}: {score.explanation}")
 # Output: relevant: Answer directly addresses the query...
 ```
 
-## Running Examples
+## 🎯 Practical Examples (NEW!)
+
+**4 production-ready examples with full testing** (2,700+ lines, 22 test suites):
+
+### Agent Examples
+
+```bash
+# LangGraph Agent - Stateful workflow with tools
+python examples/langgraph_agent_example.py
+
+# LangChain Agent - ReAct agent with multiple tools
+python examples/langchain_agent_example.py
+
+# Multi-Agent System - 4 specialized agents with orchestration
+python examples/multi_agent_example.py
+```
+
+### RAG Examples
+
+```bash
+# LangChain RAG + Qdrant - PDF processing, vector DB, RAG evaluation
+python examples/rag_langchain_qdrant.py
+```
+
+**See [PRACTICAL_EXAMPLES_GUIDE.md](PRACTICAL_EXAMPLES_GUIDE.md) for complete documentation!**
+
+---
+
+## Running Basic Examples
 
 ```bash
 # Code-based metrics
@@ -180,7 +208,7 @@ python examples/basic_usage.py
 export OPENAI_API_KEY="your-key-here"
 python examples/llm_evaluation.py
 
-# RAG evaluation (NEW!)
+# RAG evaluation
 python examples/rag_evaluation.py
 
 # Ground truth handling examples
