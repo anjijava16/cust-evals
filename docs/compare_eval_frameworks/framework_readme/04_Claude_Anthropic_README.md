@@ -480,7 +480,284 @@ message = client.messages.create(
 
 ---
 
-## Architecture Highlights
+## High-Level Architecture
+
+### Overview
+
+Claude-as-Judge operates as an LLM-powered evaluation system where Claude itself serves as the evaluator. Unlike traditional evaluation frameworks with built-in metrics, Claude provides a flexible API-based approach where evaluation logic is embedded in prompts.
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Your Evaluation System                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Evaluation Orchestrator                     │   │
+│  │  • Test case management                                  │   │
+│  │  • Prompt generation                                     │   │
+│  │  • Result aggregation                                    │   │
+│  │  • Error handling & retries                              │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         │                                        │
+│                         ▼                                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │           Evaluation Data Preparation                    │   │
+│  │  • Input: Questions/Prompts                              │   │
+│  │  • Output: AI responses to evaluate                      │   │
+│  │  • Context: Supporting documents (optional)              │   │
+│  │  • Rubric: Evaluation criteria                           │   │
+│  │  • Ground Truth: Reference answers (optional)            │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         │                                        │
+└─────────────────────────┼────────────────────────────────────────┘
+                          │ HTTPS
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Anthropic API                                 │
+│                    (api.anthropic.com)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                API Gateway                               │   │
+│  │  • Authentication (API key validation)                   │   │
+│  │  • Rate limiting (tier-based)                            │   │
+│  │  • Request routing                                       │   │
+│  │  • Load balancing                                        │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         │                                        │
+│                         ▼                                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Claude Model Inference                      │   │
+│  │  ┌────────────────────────────────────────────────────┐  │   │
+│  │  │  Model Selection                                   │  │   │
+│  │  │  • Claude 3.5 Sonnet (recommended for evals)       │  │   │
+│  │  │  • Claude 3 Opus (highest quality)                 │  │   │
+│  │  │  • Claude 3 Haiku (cost-effective)                 │  │   │
+│  │  └────────────────────────────────────────────────────┘  │   │
+│  │  ┌────────────────────────────────────────────────────┐  │   │
+│  │  │  Prompt Processing                                 │  │   │
+│  │  │  • System prompt interpretation                    │  │   │
+│  │  │  • Context window management (200K tokens)         │  │   │
+│  │  │  • Prompt caching (for repeated contexts)          │  │   │
+│  │  │  • Constitutional AI filters                       │  │   │
+│  │  └────────────────────────────────────────────────────┘  │   │
+│  │  ┌────────────────────────────────────────────────────┐  │   │
+│  │  │  Inference Engine                                  │  │   │
+│  │  │  • Token generation                                │  │   │
+│  │  │  • Reasoning & analysis                            │  │   │
+│  │  │  • Structured output generation                    │  │   │
+│  │  │  • JSON formatting                                 │  │   │
+│  │  └────────────────────────────────────────────────────┘  │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         │                                        │
+│                         ▼                                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Response Processing                         │   │
+│  │  • Token counting (prompt + completion)                 │   │
+│  │  • Cost calculation                                      │   │
+│  │  • Response formatting                                   │   │
+│  │  • Streaming support (optional)                          │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────┬────────────────────────────────────────┘
+                          │ HTTPS Response
+                          ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Your Evaluation System                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Response Parsing & Validation               │   │
+│  │  • JSON extraction                                       │   │
+│  │  • Score validation (check ranges)                       │   │
+│  │  • Error handling (malformed responses)                  │   │
+│  │  • Retry logic (if needed)                               │   │
+│  └──────────────────────┬───────────────────────────────────┘   │
+│                         │                                        │
+│                         ▼                                        │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Results Storage & Analysis                  │   │
+│  │  • Individual scores per test case                       │   │
+│  │  • Aggregate statistics                                  │   │
+│  │  • Explanations & reasoning                              │   │
+│  │  • Performance metrics (latency, cost)                   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Component Breakdown
+
+#### 1. Evaluation Orchestrator
+
+**Purpose**: Manages the evaluation workflow
+
+**Responsibilities**:
+- Load and prepare test cases
+- Generate evaluation prompts
+- Make API calls to Claude
+- Handle rate limiting and retries
+- Aggregate results
+
+**Implementation**:
+```python
+class ClaudeEvaluator:
+    def __init__(self, api_key: str, model: str = "claude-3-5-sonnet-20241022"):
+        self.client = anthropic.Anthropic(api_key=api_key)
+        self.model = model
+
+    def evaluate_batch(self, test_cases: List[dict], rubric: dict) -> List[dict]:
+        results = []
+        for case in test_cases:
+            result = self.evaluate_single(case, rubric)
+            results.append(result)
+        return results
+```
+
+#### 2. Prompt Engineering Layer
+
+**Purpose**: Craft effective evaluation prompts
+
+**Key Components**:
+- **System Prompts**: Define Claude's role as evaluator
+- **Evaluation Criteria**: Clear, measurable criteria
+- **Output Format**: Structured JSON for easy parsing
+- **Few-Shot Examples**: Optional examples for consistency
+
+**Pattern**:
+```python
+def create_evaluation_prompt(input: str, output: str, criteria: dict) -> str:
+    return f"""You are an expert evaluator. Assess the following AI response.
+
+INPUT: {input}
+OUTPUT: {output}
+
+EVALUATION CRITERIA:
+{format_criteria(criteria)}
+
+Provide scores (1-5) and explanation in JSON format:
+{{
+    "scores": {{"criterion1": X, "criterion2": Y, ...}},
+    "overall": X.X,
+    "explanation": "detailed reasoning..."
+}}"""
+```
+
+#### 3. Claude API Client
+
+**Purpose**: Interface with Anthropic's API
+
+**Features**:
+- **Authentication**: API key management
+- **Model Selection**: Choose appropriate Claude version
+- **Configuration**: Temperature, max_tokens, etc.
+- **Streaming**: Real-time response streaming (optional)
+- **Caching**: Prompt caching for cost optimization
+
+**SDK Integration**:
+```python
+import anthropic
+
+client = anthropic.Anthropic(api_key="your-key")
+
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=2048,
+    temperature=0,  # Deterministic for evaluation
+    messages=[{"role": "user", "content": evaluation_prompt}]
+)
+```
+
+#### 4. Response Parser
+
+**Purpose**: Extract and validate evaluation results
+
+**Functionality**:
+- **JSON Extraction**: Handle markdown code blocks
+- **Score Validation**: Ensure scores are in valid range
+- **Error Detection**: Catch malformed responses
+- **Fallback Logic**: Retry or use default values
+
+**Implementation**:
+```python
+def parse_evaluation_response(response_text: str) -> dict:
+    # Extract JSON from potential markdown formatting
+    if "```json" in response_text:
+        json_str = response_text.split("```json")[1].split("```")[0]
+    else:
+        json_str = response_text
+
+    result = json.loads(json_str.strip())
+
+    # Validate scores
+    for key, value in result.get("scores", {}).items():
+        if not 1 <= value <= 5:
+            raise ValueError(f"Score {key}={value} out of range")
+
+    return result
+```
+
+### Data Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Evaluation Data Flow                        │
+└─────────────────────────────────────────────────────────────┘
+
+1. PREPARATION PHASE
+   ┌──────────────────────────────────────────┐
+   │ Test Cases                               │
+   │ • Questions                              │
+   │ • AI outputs to evaluate                 │
+   │ • Context documents (optional)           │
+   │ • Ground truth (optional)                │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+2. PROMPT CONSTRUCTION
+   ┌──────────────────────────────────────────┐
+   │ Evaluation Prompt                        │
+   │ • System: Role definition                │
+   │ • Criteria: What to measure              │
+   │ • Format: JSON structure                 │
+   │ • Examples: Few-shot (optional)          │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+3. API REQUEST
+   ┌──────────────────────────────────────────┐
+   │ Claude API Call                          │
+   │ • Model: claude-3-5-sonnet-20241022      │
+   │ • Temperature: 0 (deterministic)         │
+   │ • Max tokens: 2048                       │
+   │ • Messages: [evaluation prompt]          │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+4. INFERENCE
+   ┌──────────────────────────────────────────┐
+   │ Claude Processing                        │
+   │ • Analyze input & output                 │
+   │ • Apply evaluation criteria              │
+   │ • Generate reasoning                     │
+   │ • Format as JSON                         │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+5. RESPONSE PARSING
+   ┌──────────────────────────────────────────┐
+   │ Extract & Validate                       │
+   │ • Parse JSON from response               │
+   │ • Validate score ranges                  │
+   │ • Extract explanations                   │
+   │ • Calculate tokens & cost                │
+   └──────────────────┬───────────────────────┘
+                      │
+                      ▼
+6. AGGREGATION
+   ┌──────────────────────────────────────────┐
+   │ Results Analysis                         │
+   │ • Per-case scores                        │
+   │ • Aggregate statistics (mean, median)    │
+   │ • Distribution analysis                  │
+   │ • Cost & latency tracking                │
+   └──────────────────────────────────────────┘
+```
 
 ### Evaluation Patterns
 
@@ -517,6 +794,72 @@ Then provide a score."
 Now evaluate this one: ..."
 ```
 
+### Integration Patterns
+
+#### Pattern 1: Direct API Integration
+```python
+# Simplest approach - direct API calls
+import anthropic
+
+client = anthropic.Anthropic()
+
+def evaluate(input_text, output_text):
+    prompt = create_evaluation_prompt(input_text, output_text)
+    response = client.messages.create(
+        model="claude-3-5-sonnet-20241022",
+        max_tokens=1024,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return parse_response(response)
+```
+
+#### Pattern 2: Async Batch Evaluation
+```python
+# Efficient parallel evaluation
+import asyncio
+from anthropic import AsyncAnthropic
+
+async def evaluate_batch(test_cases):
+    client = AsyncAnthropic()
+    tasks = [evaluate_single(case, client) for case in test_cases]
+    results = await asyncio.gather(*tasks)
+    return results
+```
+
+#### Pattern 3: Framework Integration
+```python
+# Integrate with evaluation frameworks
+from custom.evals import BaseEvaluator
+
+class ClaudeEvaluator(BaseEvaluator):
+    def evaluate(self, data: dict) -> dict:
+        # Use Claude as judge within framework
+        response = self.client.messages.create(...)
+        return parse_response(response)
+```
+
+#### Pattern 4: Caching for Cost Optimization
+```python
+# Use prompt caching for repeated contexts
+message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=1024,
+    system=[
+        {
+            "type": "text",
+            "text": "You are an expert evaluator...",
+        },
+        {
+            "type": "text",
+            "text": f"Evaluation rubric:\n{rubric}",
+            "cache_control": {"type": "ephemeral"}  # Cache this
+        }
+    ],
+    messages=[{"role": "user", "content": f"Evaluate: {case}"}]
+)
+# Subsequent calls within 5 min get 90% discount on cached tokens
+```
+
 ### Best Practices
 
 1. **Clear Criteria**: Define exactly what you're measuring
@@ -526,6 +869,9 @@ Now evaluate this one: ..."
 5. **Error Handling**: Catch malformed responses
 6. **Prompt Versioning**: Track prompt changes
 7. **Validation**: Check scores are in expected range
+8. **Cost Tracking**: Monitor token usage and costs
+9. **Batching**: Use async for parallel evaluation
+10. **Caching**: Leverage prompt caching for repeated contexts
 
 ---
 
