@@ -80,6 +80,7 @@ class LLM:
         else:
             raise ValueError(f"Unknown provider: {self.provider}")
 
+    
     def generate_object(
         self,
         prompt: Union[str, List[Dict[str, str]]],
@@ -118,7 +119,7 @@ class LLM:
         )
 
         return response.choices[0].message.content or ""
-
+    
     def _openai_generate_object(
         self,
         prompt: Union[str, List[Dict[str, str]]],

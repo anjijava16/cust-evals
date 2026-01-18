@@ -6,6 +6,21 @@ from custom.evals import CorrectnessEvaluator, HallucinationEvaluator, Relevance
 from custom.evals.llm import LLM
 
 
+import os
+import subprocess
+
+command = "source ~/.zprofile && env"
+proc = subprocess.Popen(
+    command,
+    stdout=subprocess.PIPE,
+    shell=True,
+    executable="/bin/zsh"
+)
+
+for line in proc.stdout:
+    key, _, value = line.decode().partition("=")
+    os.environ[key] = value.strip()
+
 def check_api_keys():
     """Check if API keys are available."""
     has_openai = "OPENAI_API_KEY" in os.environ
@@ -39,6 +54,7 @@ def example_hallucination_evaluation():
 
     # Initialize LLM and evaluator
     llm = LLM(provider=provider, model=model)
+    print(f" LLM initialized: {llm.provider} / {llm.model} {llm.generate_text("wekcine")}\n")
     evaluator = HallucinationEvaluator(llm)
 
     # Test case 1: Factual response

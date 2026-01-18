@@ -232,7 +232,8 @@ class LLMEvaluator:
                     "description": "Brief explanation of the reasoning"
                 }
             },
-            "required": ["label", "explanation"]
+            "required": ["label", "explanation"],
+            "additionalProperties": False
         }
 
     def __repr__(self) -> str:
