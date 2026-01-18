@@ -13,8 +13,9 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - **[LLM-Based Evaluators](evaluators/llm-based.md)** - General LLM evaluation (hallucination, correctness, relevance, coherence)
 - **[RAG-Specific Evaluators](evaluators/rag-specific.md)** - RAG system evaluation (faithfulness, answer relevancy)
 
-### Agent Frameworks (16+ Integrations)
+### Agent Frameworks (17+ Integrations)
 - **[Framework Index](FRAMEWORK_INDEX.md)** - Complete list of all supported frameworks with comparison table
+- **[Agno](frameworks/agno.md)** - Multi-agent systems at scale
 - **[AWS Strands Agents](frameworks/aws-strands.md)** - AWS Bedrock + Claude integration
 - **[Google ADK](frameworks/google-adk.md)** - Gemini models from Google
 - **[LangGraph](frameworks/langgraph.md)** - Stateful workflows with state graphs
@@ -65,8 +66,8 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 3. Check **[API Reference](api-reference.md)**
 
 ### For Agent Frameworks
-1. Browse **[Framework Index](FRAMEWORK_INDEX.md)** - See all 16+ supported frameworks
-2. Pick your framework (AWS Strands, Google ADK, LangGraph, etc.)
+1. Browse **[Framework Index](FRAMEWORK_INDEX.md)** - See all 17+ supported frameworks
+2. Pick your framework (Agno, AWS Strands, Google ADK, LangGraph, etc.)
 3. Follow framework-specific integration guide
 4. Evaluate with **[LLM-Based Evaluators](evaluators/llm-based.md)**
 
@@ -102,7 +103,7 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - Faithfulness Evaluator - Verify grounding in context
 - Answer Relevancy Evaluator - Check answer-query relevance
 
-### 16+ Agent Framework Integrations
+### 17+ Agent Framework Integrations
 
 **Cloud Platforms**
 - AWS Strands Agents, Google ADK, Databricks Agent Bricks
@@ -117,7 +118,7 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - OpenAI Agents Framework, OpenAI Agents SDK, OpenAI Assistants, OpenAI Swarm
 
 **Others**
-- CrewAI, Pydantic AI
+- Agno, CrewAI, Pydantic AI
 
 **[→ View All Frameworks](FRAMEWORK_INDEX.md)**
 

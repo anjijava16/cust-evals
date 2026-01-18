@@ -1,8 +1,8 @@
 # Custom Evals - Multi-Framework LLM Evaluation
 
-A lightweight, comprehensive evaluation framework for LLM outputs with support for **16+ agent frameworks** and multi-framework evaluation patterns.
+A lightweight, comprehensive evaluation framework for LLM outputs with support for **17+ agent frameworks** and multi-framework evaluation patterns.
 
-**🔥 NEW: 16+ Agent Framework Integrations with Custom-Evals!**
+**🔥 NEW: 17+ Agent Framework Integrations with Custom-Evals!**
 
 ---
 
@@ -65,7 +65,7 @@ print(f"{score.label}: {score.explanation}")
 - **[Project Overview](reference/PROJECT_OVERVIEW.md)** - Complete project structure
 - **[Documentation Index](reference/INDEX.md)** - Full documentation index
 
-### 🤖 Agent Frameworks (16+ Integrations)
+### 🤖 Agent Frameworks (17+ Integrations)
 
 **[📦 Framework Index →](docs/FRAMEWORK_INDEX.md)** - Complete list of all supported frameworks
 
@@ -92,6 +92,7 @@ print(f"{score.label}: {score.explanation}")
 - **[OpenAI Swarm](docs/frameworks/openai-swarm.md)** - Lightweight multi-agent
 
 #### Other Frameworks
+- **[Agno](docs/frameworks/agno.md)** - Multi-agent systems at scale
 - **[CrewAI](docs/frameworks/crewai.md)** - Role-based agents
 - **[Pydantic AI](docs/frameworks/pydanticai.md)** - Type-safe agents
 
@@ -137,7 +138,7 @@ llm = LLM(provider="anthropic", model="claude-3-haiku-20240307")
 
 ## 📊 Agent Framework Integration
 
-Custom Evals integrates with **16+ agent frameworks** for comprehensive evaluation:
+Custom Evals integrates with **17+ agent frameworks** for comprehensive evaluation:
 
 ### Example: Evaluate Any Agent
 
@@ -162,7 +163,7 @@ print(f"Coherence: {coherence_score.label} ({coherence_score.score:.2f})")
 print(f"Relevance: {relevance_score.label} ({relevance_score.score:.2f})")
 ```
 
-**See [Framework Index](docs/FRAMEWORK_INDEX.md) for all 16+ supported frameworks!**
+**See [Framework Index](docs/FRAMEWORK_INDEX.md) for all 17+ supported frameworks!**
 
 ---
 
@@ -226,7 +227,7 @@ cust-evals/
 │   └── INDEX.md
 │
 ├── docs/                       # 📦 Complete documentation
-│   ├── FRAMEWORK_INDEX.md     # Index of all 16+ frameworks
+│   ├── FRAMEWORK_INDEX.md     # Index of all 17+ frameworks
 │   ├── frameworks/            # Individual framework guides
 │   │   ├── aws-strands.md
 │   │   ├── google-adk.md
@@ -357,7 +358,7 @@ MIT
 
 ---
 
-**Total Agent Frameworks**: 16+
+**Total Agent Frameworks**: 17+
 **Total Examples**: 20+ working examples
 **Total Tests**: 150+ comprehensive tests
 **Documentation**: 300KB+ comprehensive guides

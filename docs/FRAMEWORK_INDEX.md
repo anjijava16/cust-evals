@@ -263,10 +263,29 @@ export OPENAI_API_KEY="your-key"
 
 ### Other Frameworks
 
-#### 15. **CrewAI**
-**Provider**: CrewAI  
-**Models**: OpenAI, others  
-**Best For**: Role-based multi-agent systems  
+#### 15. **Agno** 🆕
+**Provider**: Agno
+**Models**: Anthropic Claude, OpenAI, Google Gemini, others
+**Best For**: Multi-agent systems at scale, workflow automation
+
+```bash
+pip install agno anthropic
+export ANTHROPIC_API_KEY="your-key"
+```
+
+- **Documentation**: [Agno Guide](frameworks/agno.md)
+- **Example**: `examples/agno_example.py`
+- **Official Docs**: https://docs.agno.com/
+- **GitHub**: https://github.com/agno-agi/agno
+- **Features**: Multi-agent Teams, workflow automation, MCP support, knowledge management (RAG), memory persistence, structured I/O, multimodal support, reasoning
+- **Test Suites**: 5 comprehensive tests
+
+---
+
+#### 16. **CrewAI**
+**Provider**: CrewAI
+**Models**: OpenAI, others
+**Best For**: Role-based multi-agent systems
 
 ```bash
 pip install crewai
@@ -279,10 +298,10 @@ export OPENAI_API_KEY="your-key"
 
 ---
 
-#### 16. **Pydantic AI**
-**Provider**: Pydantic  
-**Models**: OpenAI, others  
-**Best For**: Type-safe agents, structured outputs  
+#### 17. **Pydantic AI**
+**Provider**: Pydantic
+**Models**: OpenAI, others
+**Best For**: Type-safe agents, structured outputs
 
 ```bash
 pip install pydantic-ai
@@ -299,6 +318,7 @@ export OPENAI_API_KEY="your-key"
 
 | Framework | Provider | Models | Multi-Agent | Tools | MLflow | Best For |
 |-----------|----------|--------|-------------|-------|--------|----------|
+| **Agno** | Agno | Claude/GPT+ | ✅ | Decorator/MCP | ❌ | Multi-agent scale |
 | **AWS Strands** | AWS | Claude | ✅ | Class | ❌ | AWS apps |
 | **Google ADK** | Google | Gemini | ✅ | Decorator | ❌ | Google Cloud |
 | **Databricks** | Databricks | OpenAI+ | ✅ | Function | ✅ | Data/ML |
@@ -319,6 +339,7 @@ export OPENAI_API_KEY="your-key"
 ### 1. Choose Your Framework
 
 Select based on your requirements:
+- **Multi-Agent at Scale**: Agno
 - **AWS/Claude**: AWS Strands
 - **Google Cloud/Gemini**: Google ADK
 - **Data/ML**: Databricks Agent Bricks
@@ -421,7 +442,8 @@ def validate_quality_gates(scores):
 
 ## 📚 Documentation Links
 
-### New Frameworks (Full Docs)
+### Complete Framework Documentation
+- [Agno](frameworks/agno.md)
 - [AWS Strands Agents](frameworks/aws-strands.md)
 - [Google ADK](frameworks/google-adk.md)
 - [LlamaIndex Workflows](frameworks/llamaindex-workflows.md)
@@ -429,8 +451,6 @@ def validate_quality_gates(scores):
 - [Databricks Agent Bricks](frameworks/databricks-agent-bricks.md)
 - [Semantic Kernel](frameworks/semantic-kernel.md)
 - [LangGraph](frameworks/langgraph.md)
-
-### Existing Frameworks
 - [Autogen](frameworks/autogen.md)
 - [CrewAI](frameworks/crewai.md)
 - [Pydantic AI](frameworks/pydanticai.md)
@@ -484,10 +504,10 @@ for metric, score in scores.items():
 
 ---
 
-**Total Frameworks**: 16+ agent frameworks + RAG integrations  
-**Custom-Evals**: Fully integrated across all frameworks  
-**Documentation**: Complete with examples and best practices  
+**Total Frameworks**: 17+ agent frameworks + RAG integrations
+**Custom-Evals**: Fully integrated across all frameworks
+**Documentation**: Complete with examples and best practices
 
-**Created**: 2026-01-17  
-**Last Updated**: 2026-01-17  
+**Created**: 2026-01-17
+**Last Updated**: 2026-01-17
 **Status**: Production Ready
