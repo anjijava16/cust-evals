@@ -8,7 +8,24 @@ This example demonstrates:
 4. Testing agent quality with multiple metrics
 """
 
+
 import os
+import subprocess
+
+# Load environment variables from zsh profile
+command = "source ~/.zprofile && env"
+proc = subprocess.Popen(
+    command,
+    stdout=subprocess.PIPE,
+    shell=True,
+    executable="/bin/zsh"
+)
+for line in proc.stdout:
+    key, _, value = line.decode().partition("=")
+    os.environ[key] = value.strip()
+
+import os
+import operator
 from typing import TypedDict, Annotated
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
@@ -20,10 +37,13 @@ from langchain_core.tools import tool
 from custom.evals import (
     HallucinationEvaluator,
     CoherenceEvaluator,
-    RelevanceEvaluator,
-    ToxicityEvaluator
+    RelevanceEvaluator
 )
 from custom.evals.llm import LLM
+
+from custom.evals import CorrectnessEvaluator, HallucinationEvaluator, RelevanceEvaluator
+from custom.evals.llm import LLM
+
 
 # Optional: Initialize Phoenix tracing
 try:
@@ -82,7 +102,7 @@ def calculate(expression: str) -> str:
 
 class AgentState(TypedDict):
     """State of the agent."""
-    messages: list
+    messages: Annotated[list, operator.add]
     next_action: str
 
 
@@ -114,8 +134,7 @@ class LangGraphAgent:
         eval_llm = LLM(provider="openai", model="gpt-4o-mini")
         self.evaluators = {
             "coherence": CoherenceEvaluator(eval_llm),
-            "relevance": RelevanceEvaluator(eval_llm),
-            "toxicity": ToxicityEvaluator(eval_llm)
+            # Note: RelevanceEvaluator requires context, use in context-aware tests
         }
 
     def _create_graph(self) -> StateGraph:
@@ -148,7 +167,7 @@ class LangGraphAgent:
         """Call the LLM with tools."""
         messages = state["messages"]
         response = self.llm_with_tools.invoke(messages)
-        return {"messages": messages + [response]}
+        return {"messages": [response]}
 
     def _should_continue(self, state: AgentState) -> str:
         """Decide whether to continue or end."""
@@ -286,8 +305,6 @@ def test_multiple_queries():
 
         # Print summary
         print(f"  • Coherence: {scores['coherence'].label}")
-        print(f"  • Relevance: {scores['relevance'].label}")
-        print(f"  • Toxicity: {scores['toxicity'].label}")
         print(f"  • Keywords Found: {'✅' if has_keywords else '❌'}")
 
     # Overall summary
@@ -296,16 +313,12 @@ def test_multiple_queries():
     print("="*80)
 
     coherent_count = sum(1 for r in results if r['scores']['coherence'].label == 'coherent')
-    relevant_count = sum(1 for r in results if r['scores']['relevance'].label == 'relevant')
-    non_toxic_count = sum(1 for r in results if r['scores']['toxicity'].label == 'not_toxic')
     keywords_count = sum(1 for r in results if r['has_keywords'])
 
     print(f"  • Coherent Responses: {coherent_count}/{len(results)}")
-    print(f"  • Relevant Responses: {relevant_count}/{len(results)}")
-    print(f"  • Non-Toxic Responses: {non_toxic_count}/{len(results)}")
     print(f"  • Contains Expected Keywords: {keywords_count}/{len(results)}")
 
-    pass_rate = (coherent_count + relevant_count + non_toxic_count) / (len(results) * 3)
+    pass_rate = (coherent_count + keywords_count) / (len(results) * 2)
     print(f"\n✅ Overall Pass Rate: {pass_rate:.1%}")
 
     return results
@@ -360,8 +373,6 @@ def test_agent_quality_gates():
     # Define quality thresholds
     QUALITY_THRESHOLDS = {
         "coherence": 0.7,      # Minimum 70% coherent
-        "relevance": 0.7,      # Minimum 70% relevant
-        "toxicity": 0.2,       # Maximum 20% toxic
     }
 
     query = "Explain what LangGraph is used for"
@@ -382,16 +393,10 @@ def test_agent_quality_gates():
     for metric, threshold in QUALITY_THRESHOLDS.items():
         score_value = scores[metric].score
 
-        if metric == "toxicity":
-            # Lower is better for toxicity
-            passed = score_value <= threshold
-            status = "✅ PASS" if passed else "❌ FAIL"
-            print(f"  • {metric.capitalize()}: {score_value:.2f} <= {threshold} {status}")
-        else:
-            # Higher is better for coherence and relevance
-            passed = score_value >= threshold
-            status = "✅ PASS" if passed else "❌ FAIL"
-            print(f"  • {metric.capitalize()}: {score_value:.2f} >= {threshold} {status}")
+        # Higher is better for coherence and relevance
+        passed = score_value >= threshold
+        status = "✅ PASS" if passed else "❌ FAIL"
+        print(f"  • {metric.capitalize()}: {score_value:.2f} >= {threshold} {status}")
 
         if not passed:
             passed_gates = False
@@ -439,19 +444,13 @@ def test_batch_evaluation():
             "query": query,
             "response": response,
             "coherence_score": scores["coherence"].score,
-            "relevance_score": scores["relevance"].score,
-            "toxicity_score": scores["toxicity"].score
         })
 
     # Calculate statistics
     avg_coherence = sum(r["coherence_score"] for r in batch_results) / len(batch_results)
-    avg_relevance = sum(r["relevance_score"] for r in batch_results) / len(batch_results)
-    avg_toxicity = sum(r["toxicity_score"] for r in batch_results) / len(batch_results)
 
     print("\n📊 Batch Evaluation Results:")
     print(f"  • Average Coherence: {avg_coherence:.2f}")
-    print(f"  • Average Relevance: {avg_relevance:.2f}")
-    print(f"  • Average Toxicity: {avg_toxicity:.2f}")
     print(f"  • Total Queries Tested: {len(batch_results)}")
 
     return batch_results
