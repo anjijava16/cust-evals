@@ -13,6 +13,30 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 - **[LLM-Based Evaluators](evaluators/llm-based.md)** - General LLM evaluation (hallucination, correctness, relevance, coherence)
 - **[RAG-Specific Evaluators](evaluators/rag-specific.md)** - RAG system evaluation (faithfulness, answer relevancy)
 
+### Agent Frameworks (16+ Integrations)
+- **[Framework Index](FRAMEWORK_INDEX.md)** - Complete list of all supported frameworks with comparison table
+- **[AWS Strands Agents](frameworks/aws-strands.md)** - AWS Bedrock + Claude integration
+- **[Google ADK](frameworks/google-adk.md)** - Gemini models from Google
+- **[LangGraph](frameworks/langgraph.md)** - Stateful workflows with state graphs
+- **[LlamaIndex Workflows](frameworks/llamaindex-workflows.md)** - Event-driven agent orchestration
+- **[Microsoft Agent Framework](frameworks/microsoft-agent-framework.md)** - Enterprise production agents
+- **[Databricks Agent Bricks](frameworks/databricks-agent-bricks.md)** - MLflow integration for data workflows
+- **[Semantic Kernel](frameworks/semantic-kernel.md)** - Microsoft's plugin-based SDK
+- **[Autogen](frameworks/autogen.md)** - Multi-agent conversations
+- **[CrewAI](frameworks/crewai.md)** - Role-based multi-agent systems
+- **[Pydantic AI](frameworks/pydanticai.md)** - Type-safe agent development
+- **[OpenAI Agents Framework](frameworks/openai-agents-framework.md)** - Official OpenAI patterns
+- **[OpenAI Agents SDK](frameworks/openai-agents.md)** - Function calling agents
+- **[OpenAI Assistants](frameworks/openai-assistants.md)** - Persistent conversation threads
+- **[OpenAI Swarm](frameworks/openai-swarm.md)** - Lightweight multi-agent orchestration
+- **[LangChain RAG](frameworks/langchain-rag.md)** - RAG with LangChain
+- **[LlamaIndex RAG](frameworks/llamaindex-rag.md)** - RAG with LlamaIndex
+
+### Integration Guides
+- **[Agents & Multi-Agent Systems](agents-integration.md)** - Integrate with any agent framework
+- **[RAG Applications](rag-integration.md)** - Evaluate RAG pipelines
+- **[LLM Applications](llm-app-integration.md)** - Chatbots, Q&A, summarization
+
 ### API Reference
 - **[Core API](api-reference.md)** - Score class, create_evaluator decorator, evaluator methods
 - **[LLM Integration](llm-integration.md)** - LLM class, supported providers, configuration
@@ -40,10 +64,17 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 2. Use **[LLM-Based Evaluators](evaluators/llm-based.md)**
 3. Check **[API Reference](api-reference.md)**
 
+### For Agent Frameworks
+1. Browse **[Framework Index](FRAMEWORK_INDEX.md)** - See all 16+ supported frameworks
+2. Pick your framework (AWS Strands, Google ADK, LangGraph, etc.)
+3. Follow framework-specific integration guide
+4. Evaluate with **[LLM-Based Evaluators](evaluators/llm-based.md)**
+
 ### For RAG Systems
 1. Read **[RAG-Specific Evaluators](evaluators/rag-specific.md)**
-2. See **[Framework Comparison](framework-comparison.md)**
-3. Try **[RAG Examples](examples.md#rag-evaluation)**
+2. Check **[LangChain RAG](frameworks/langchain-rag.md)** or **[LlamaIndex RAG](frameworks/llamaindex-rag.md)**
+3. See **[Framework Comparison](framework-comparison.md)**
+4. Try **[RAG Examples](examples.md#rag-evaluation)**
 
 ### For Contributors
 1. Read **[Architecture](architecture.md)**
@@ -70,6 +101,25 @@ Welcome to the **Custom Evals** documentation! This is a lightweight, flexible e
 **RAG-Specific (2)**
 - Faithfulness Evaluator - Verify grounding in context
 - Answer Relevancy Evaluator - Check answer-query relevance
+
+### 16+ Agent Framework Integrations
+
+**Cloud Platforms**
+- AWS Strands Agents, Google ADK, Databricks Agent Bricks
+
+**Microsoft Ecosystem**
+- Microsoft Agent Framework, Semantic Kernel, Autogen
+
+**LangChain & LlamaIndex**
+- LangGraph, LlamaIndex Workflows, LangChain RAG, LlamaIndex RAG
+
+**OpenAI Frameworks**
+- OpenAI Agents Framework, OpenAI Agents SDK, OpenAI Assistants, OpenAI Swarm
+
+**Others**
+- CrewAI, Pydantic AI
+
+**[→ View All Frameworks](FRAMEWORK_INDEX.md)**
 
 ### Key Features
 
