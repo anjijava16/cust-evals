@@ -67,6 +67,21 @@ nav:
       - Getting Started: getting-started.md
       - Examples: examples.md
 
+  - Guides:
+      - Quick Start: guides/QUICKSTART.md
+      - Agents & RAG Quick Start: guides/AGENTS_RAG_QUICKSTART.md
+      - LLM Integration: guides/LLM_GUIDE.md
+      - Ground Truth: guides/GROUND_TRUTH_GUIDE.md
+      - Tracing: guides/TRACING_GUIDE.md
+      - Practical Examples: guides/PRACTICAL_EXAMPLES_GUIDE.md
+
+  - Reference:
+      - Architecture: reference/ARCHITECTURE.md
+      - Framework Comparison: reference/FRAMEWORK_COMPARISON.md
+      - Framework Support: reference/FRAMEWORK_SUPPORT.md
+      - Project Overview: reference/PROJECT_OVERVIEW.md
+      - Documentation Index: reference/INDEX.md
+
   - Evaluators:
       - Code-Based Metrics: evaluators/code-based.md
       - LLM-Based Evaluators: evaluators/llm-based.md
@@ -76,6 +91,25 @@ nav:
       - Agents & Multi-Agent: agents-integration.md
       - RAG Applications: rag-integration.md
       - LLM Applications: llm-app-integration.md
+
+  - Agent Frameworks:
+      - Framework Index: FRAMEWORK_INDEX.md
+      - AWS Strands Agents: frameworks/aws-strands.md
+      - Google ADK: frameworks/google-adk.md
+      - LlamaIndex Workflows: frameworks/llamaindex-workflows.md
+      - Microsoft Agent Framework: frameworks/microsoft-agent-framework.md
+      - Databricks Agent Bricks: frameworks/databricks-agent-bricks.md
+      - Semantic Kernel: frameworks/semantic-kernel.md
+      - LangGraph: frameworks/langgraph.md
+      - CrewAI: frameworks/crewai.md
+      - Pydantic AI: frameworks/pydanticai.md
+      - OpenAI Agents SDK: frameworks/openai-agents.md
+      - OpenAI Agents Framework: frameworks/openai-agents-framework.md
+      - OpenAI Assistants: frameworks/openai-assistants.md
+      - OpenAI Swarm: frameworks/openai-swarm.md
+      - Autogen: frameworks/autogen.md
+      - LangChain RAG: frameworks/langchain-rag.md
+      - LlamaIndex RAG: frameworks/llamaindex-rag.md
 
   - Guides:
       - API Reference: api-reference.md
