@@ -33,7 +33,7 @@ print("\n1. Initializing tracing...")
 initialize_tracing(
     enabled=True,
     service_name="custom-evals-demo",
-    phoenix_endpoint="http://localhost:6006/v1/traces",  # Phoenix collector endpoint
+    phoenix_endpoint="http://localhost:4317",  # Phoenix collector endpoint
     console_export=False  # Set to True for console debugging
 )
 print("✓ Tracing initialized")

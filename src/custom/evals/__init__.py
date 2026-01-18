@@ -13,7 +13,14 @@ from .metrics import custom_accuracy, exact_match, sentiment_score
 
 # Tracing support (optional)
 try:
-    from .tracing import initialize_tracing, get_tracer, traced, add_span_attributes
+    from .tracing import (
+        initialize_tracing,
+        get_tracer,
+        traced,
+        add_span_attributes,
+        force_flush_tracing,
+        shutdown_tracing,
+    )
     TRACING_AVAILABLE = True
 except ImportError:
     TRACING_AVAILABLE = False
@@ -21,6 +28,8 @@ except ImportError:
     get_tracer = None
     traced = None
     add_span_attributes = None
+    force_flush_tracing = None
+    shutdown_tracing = None
 
 __version__ = "0.1.0"
 
@@ -44,4 +53,6 @@ __all__ = [
     "get_tracer",
     "traced",
     "add_span_attributes",
+    "force_flush_tracing",
+    "shutdown_tracing",
 ]

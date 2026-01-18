@@ -1,11 +1,12 @@
 """LLM-based evaluators for classification tasks."""
 
 import asyncio
+import time
 from typing import Any, Dict, List, Optional
 
 from .evaluators import Score
 from .llm import LLM, PromptTemplate
-from .tracing import get_tracer, add_span_attributes
+from .tracing import get_tracer, add_span_attributes, record_evaluation_metrics
 
 
 class LLMEvaluator:
@@ -105,6 +106,9 @@ class LLMEvaluator:
         Returns:
             Score with LLM judgment
         """
+        # Start timing for metrics
+        start_time = time.time()
+
         # Create tracing span
         tracer = get_tracer()
         with tracer.span(f"evaluate.{self.name}", attributes={
@@ -121,7 +125,8 @@ class LLMEvaluator:
             # If ground truth is required but not available, return error score
             if self.REQUIRES_GROUND_TRUTH and not has_ground_truth:
                 add_span_attributes({"result": "no_ground_truth"})
-                return Score(
+                latency = time.time() - start_time
+                score_result = Score(
                     score=0.0,
                     name=self.name,
                     label="no_ground_truth",
@@ -130,6 +135,16 @@ class LLMEvaluator:
                     direction=self.DIRECTION,  # type: ignore
                     metadata={"model": self.llm.model, "has_ground_truth": False}
                 )
+                # Record metrics for error case
+                record_evaluation_metrics(
+                    evaluator_name=self.name,
+                    score=0.0,
+                    label="no_ground_truth",
+                    latency_seconds=latency,
+                    model=self.llm.model,
+                    provider=self.llm.provider
+                )
+                return score_result
 
             # Select appropriate prompt template
             if has_ground_truth or not self.PROMPT_TEMPLATE_NO_GROUND_TRUTH:
@@ -142,7 +157,8 @@ class LLMEvaluator:
                 prompt = prompt_template.format(**eval_input)
             except KeyError as e:
                 add_span_attributes({"result": "error", "error": str(e)})
-                return Score(
+                latency = time.time() - start_time
+                score_result = Score(
                     score=0.0,
                     name=self.name,
                     label="error",
@@ -151,6 +167,16 @@ class LLMEvaluator:
                     direction=self.DIRECTION,  # type: ignore
                     metadata={"model": self.llm.model, "error": str(e)}
                 )
+                # Record metrics for error case
+                record_evaluation_metrics(
+                    evaluator_name=self.name,
+                    score=0.0,
+                    label="error",
+                    latency_seconds=latency,
+                    model=self.llm.model,
+                    provider=self.llm.provider
+                )
+                return score_result
 
             # Create schema for structured output
             schema = self._create_output_schema()
@@ -163,11 +189,25 @@ class LLMEvaluator:
             explanation = response.get("explanation", "")
             score_value = self.CHOICES.get(label, 0.0)
 
+            # Calculate latency
+            latency = time.time() - start_time
+
             # Add result to span
             add_span_attributes({
                 "result.label": label,
                 "result.score": score_value,
+                "latency.seconds": latency,
             })
+
+            # Record metrics
+            record_evaluation_metrics(
+                evaluator_name=self.name,
+                score=score_value,
+                label=label,
+                latency_seconds=latency,
+                model=self.llm.model,
+                provider=self.llm.provider
+            )
 
             return Score(
                 score=score_value,

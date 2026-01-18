@@ -1,24 +1,31 @@
-# Phoenix Tracing (Optional)
+# Phoenix Tracing & Metrics (Optional)
 
-**Tracing is completely optional.** Custom Evals works perfectly end-to-end without tracing. This guide is only for users who want observability with Phoenix (Arize).
+**Tracing and metrics are completely optional.** Custom Evals works perfectly end-to-end without observability. This guide is only for users who want comprehensive monitoring with Phoenix (Arize).
 
-## Why Tracing?
+## Why Tracing & Metrics?
 
-Tracing provides observability into your evaluations:
+Tracing and metrics provide full observability into your evaluations:
 
+### Tracing (Individual Operations)
 - 📊 **Visualize** evaluation flows in Phoenix UI
-- 🔍 **Debug** performance issues
-- ⏱️ **Monitor** latency and costs
-- 📈 **Analyze** patterns across evaluations
-- 🎯 **Track** model usage
+- 🔍 **Debug** specific requests and issues
+- ⏱️ **Monitor** individual operation timing
+- 🎯 **Track** execution paths
 
-**When to use tracing:**
+### Metrics (Aggregated Statistics)
+- 📈 **Analyze** trends over time
+- 📊 **Monitor** score distributions
+- ⚡ **Track** latency percentiles (P50, P95, P99)
+- 🚨 **Set alerts** for anomalies
+- 📉 **Calculate** error rates
+
+**When to use tracing & metrics:**
 - Production deployments
-- Performance debugging
+- Performance monitoring
 - A/B testing models
-- Monitoring evaluation patterns
+- Trend analysis and alerting
 
-**When to skip tracing:**
+**When to skip:**
 - Quick local testing
 - Development and prototyping
 - When Phoenix is not available
@@ -73,6 +80,36 @@ score = evaluator.evaluate({
 print(f"Result: {score.label}")  # Same code, now traced in Phoenix!
 ```
 
+### Option 3: With Tracing + Metrics (Full Observability)
+
+For complete monitoring with aggregated statistics:
+
+```python
+from custom.evals import initialize_tracing, HallucinationEvaluator
+from custom.evals.llm import LLM
+
+# Step 1: Initialize tracing AND metrics
+initialize_tracing(
+    phoenix_endpoint="http://localhost:6006/v1/traces",
+    metrics_enabled=True  # Enable metrics collection!
+)
+
+# Step 2: Use evaluators normally (now traced + metrics collected!)
+llm = LLM(provider="openai", model="gpt-4o-mini")
+evaluator = HallucinationEvaluator(llm)
+
+score = evaluator.evaluate({
+    "input": "What is the capital of France?",
+    "output": "Paris is the capital of France.",
+    "context": "Paris is the capital of France."
+})
+
+print(f"Result: {score.label}")
+# Automatic metrics: evaluation count, score distribution, latency!
+```
+
+**📊 See [METRICS.md](./METRICS.md) for complete metrics documentation.**
+
 ---
 
 ## Setup (Only if You Want Tracing)
@@ -123,7 +160,9 @@ from custom.evals import initialize_tracing
 initialize_tracing(
     enabled=True,  # Enable/disable tracing
     service_name="my-app",  # Service name in Phoenix UI
-    phoenix_endpoint="http://localhost:6006/v1/traces"  # Phoenix endpoint
+    phoenix_endpoint="http://localhost:6006/v1/traces",  # Phoenix endpoint
+    metrics_enabled=True,  # Enable metrics collection
+    metrics_export_interval=30000  # Export metrics every 30 seconds
 )
 ```
 
@@ -161,7 +200,9 @@ initialize_tracing(enabled=False)
 
 ---
 
-## What Gets Traced
+## What Gets Traced & Measured
+
+### Traces (Individual Operations)
 
 When tracing is enabled, every evaluation creates a span with:
 
@@ -174,6 +215,27 @@ When tracing is enabled, every evaluation creates a span with:
 - `has_ground_truth` - Whether ground truth was provided
 - `result.label` - Evaluation label (e.g., "factual", "hallucinated")
 - `result.score` - Numerical score (0.0 to 1.0)
+- `latency.seconds` - Evaluation latency
+
+### Metrics (Aggregated Statistics)
+
+When metrics are enabled (`metrics_enabled=True`), these metrics are automatically collected:
+
+**1. `evals.evaluations.total` (Counter)**
+- Total number of evaluations
+- Labels: evaluator, label, model, provider
+
+**2. `evals.score` (Histogram)**
+- Distribution of evaluation scores
+- Enables: P50, P95, P99, avg calculations
+- Labels: evaluator, label, model, provider
+
+**3. `evals.latency.seconds` (Histogram)**
+- Distribution of evaluation latencies
+- Enables: P50, P95, P99 latency calculations
+- Labels: evaluator, label, model, provider
+
+**📊 See [METRICS.md](./METRICS.md) for detailed metrics documentation.**
 
 ---
 
@@ -365,38 +427,63 @@ initialize_tracing(enabled=False)
 
 ---
 
-## Complete Example
+## Complete Examples
 
-See **[examples/tracing_example.py](../examples/tracing_example.py)** for a complete working example.
+### Tracing Example
+
+See **[examples/tracing_example.py](../examples/tracing_example.py)** for a complete tracing example.
 
 ```bash
-# Run the example
+# Run the tracing example
 python examples/tracing_example.py
 
 # Open Phoenix UI
 # http://localhost:6006
 ```
 
+### Metrics Example (NEW!)
+
+See **[examples/metrics_example.py](../examples/metrics_example.py)** for a complete metrics example.
+
+```bash
+# Run the metrics example
+python examples/metrics_example.py
+
+# Open Phoenix UI to see metrics
+# http://localhost:6006
+```
+
+This example demonstrates:
+- Automatic metric collection
+- Custom metrics recording
+- Viewing metrics in Phoenix
+- Understanding metric types
+
 ---
 
 ## Key Takeaways
 
-✅ **Tracing is completely optional** - Framework works perfectly without it
+✅ **Tracing & metrics are completely optional** - Framework works perfectly without them
 
 ✅ **Easy to enable** - Just call `initialize_tracing()` with your Phoenix endpoint
 
-✅ **Zero code changes** - Same evaluator code works with or without tracing
+✅ **Zero code changes** - Same evaluator code works with or without observability
 
 ✅ **Production-ready** - Minimal overhead (~5-10ms per evaluation)
 
-✅ **Powerful observability** - Full visibility into evaluation flows
+✅ **Powerful observability** - Full visibility with traces + aggregated metrics
+
+✅ **Automatic metrics** - Evaluators automatically record counts, scores, and latencies
+
+✅ **Custom metrics** - Add your own counters and histograms as needed
 
 ---
 
 ## Learn More
 
-- **[TRACING_GUIDE.md](../TRACING_GUIDE.md)** - Complete tracing guide
-- **[FRAMEWORK_SUPPORT.md](../FRAMEWORK_SUPPORT.md)** - Multi-framework support
+- **[METRICS.md](./METRICS.md)** - Complete metrics guide (NEW!)
+- **[examples/metrics_example.py](../examples/metrics_example.py)** - Metrics example code
+- **[examples/tracing_example.py](../examples/tracing_example.py)** - Tracing example code
 - **[Phoenix Documentation](https://docs.arize.com/phoenix)** - Official Phoenix docs
 - **[OpenTelemetry](https://opentelemetry.io/)** - OpenTelemetry documentation
 
