@@ -56,6 +56,8 @@ print(f"{score.label}: {score.explanation}")
 - **[LLM Integration Guide](guides/LLM_GUIDE.md)** - OpenAI, Anthropic, and other providers
 - **[Ground Truth Guide](guides/GROUND_TRUTH_GUIDE.md)** - Flexible ground truth handling
 - **[Tracing Guide](guides/TRACING_GUIDE.md)** - Optional Phoenix tracing with OpenTelemetry
+- **[Non-LLM Evaluation Guide](docs/NON_LLM_EVALUATION_GUIDE.md)** - AWS Textract, OCR, and document extraction (NEW)
+- **[Textract Quick Start](docs/TEXTRACT_QUICKSTART.md)** - Get started with AWS Textract in 5 minutes (NEW)
 
 ### 🔍 Reference Documentation
 
@@ -106,6 +108,14 @@ print(f"{score.label}: {score.explanation}")
 - **Exact Match** - Binary comparison
 - **Sentiment Score** - Sentiment analysis
 - **Custom Accuracy** - Flexible accuracy with normalization
+
+**OCR/Document Extraction Metrics:** (NEW - for non-LLM services like AWS Textract)
+- **Text Extraction Accuracy** - Fuzzy string matching
+- **Character Error Rate (CER)** - Character-level accuracy
+- **Word Error Rate (WER)** - Word-level accuracy
+- **Bounding Box IoU** - Spatial accuracy for OCR
+- **Confidence Threshold** - Quality gating
+- **Field Detection Accuracy** - Form field detection (F1 score)
 
 **LLM-Based Evaluators:**
 - **Coherence** - Logical flow and consistency
@@ -181,6 +191,9 @@ python examples/llm_evaluation.py
 
 # RAG evaluation
 python examples/rag_evaluation.py
+
+# AWS Textract/OCR evaluation (NEW)
+python examples/textract_evaluation_example.py
 ```
 
 ### Production-Ready Agent Examples
